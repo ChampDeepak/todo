@@ -1,1 +1,11 @@
-# todo
+# Feature Scope 
+- Create Task
+- View Tasks
+- Edit Task
+- Delete Task
+- Mark Task Complete
+- Filter by Status
+- Task Priority
+- Due Date
+- Task Statistics
+- Responsive UI
