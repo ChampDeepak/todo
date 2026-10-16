@@ -132,7 +132,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 7.1 `terraform plan` output
 
 - [ ] **Save as:** `m7-terraform-plan.png`
-- **Capture:** terminal running `terraform plan`
+- **Capture:** `cd /Users/deepak/sst/todo/terraform && AWS_PROFILE=project terraform plan`
 - **Must be visible:** the final summary line — `Plan: N to add, 0 to change, 0 to destroy` — with no errors above it.
 
 ![M7 terraform plan](screenshots/m7-terraform-plan.png)
@@ -140,23 +140,25 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 7.2 AWS Console — VPC
 
 - [ ] **Save as:** `m7-aws-vpc.png`
-- **Capture:** AWS Console → VPC → *Your VPCs*, and the *Subnets* list
-- **Must be visible:** the VPC and **at least two public subnets**, with the region selector showing the expected region.
+- **Capture:** <https://ap-south-1.console.aws.amazon.com/vpcconsole/home?region=ap-south-1#vpcs:> then the *Subnets* page
+- **Look for:** VPC named **`taskr-vpc`**, and subnets **`taskr-public-1`** and **`taskr-public-2`** (one per availability zone)
+- **Must be visible:** the region selector showing **Mumbai / ap-south-1**, and at least two public subnets. Account is `804210701870`, profile `project`.
 
 ![M7 AWS VPC](screenshots/m7-aws-vpc.png)
 
 ### 7.3 AWS Console — EKS cluster
 
 - [ ] **Save as:** `m7-aws-eks.png`
-- **Capture:** AWS Console → EKS → the cluster's overview page
-- **Must be visible:** cluster status `Active`, and the node group with at least one worker node.
+- **Capture:** <https://ap-south-1.console.aws.amazon.com/eks/home?region=ap-south-1#/clusters/taskr-cluster>
+- **Look for:** cluster **`taskr-cluster`**, Kubernetes 1.31, node group **`taskr-nodes`**
+- **Must be visible:** cluster status **`Active`** and the node group showing 2 nodes. Grab the *Compute* tab too if it fits.
 
 ![M7 AWS EKS](screenshots/m7-aws-eks.png)
 
 ### 7.4 `terraform destroy` completed
 
 - [ ] **Save as:** `m7-terraform-destroy.png`
-- **Capture:** terminal after `terraform destroy`
+- **Capture:** `cd /Users/deepak/sst/todo/terraform && AWS_PROFILE=project terraform destroy` — I will run this for you; capture the final frame
 - **Must be visible:** `Destroy complete! N resources destroyed.` This protects you from a runaway AWS bill *and* is worth 2 points.
 
 ![M7 terraform destroy](screenshots/m7-terraform-destroy.png)
@@ -229,6 +231,8 @@ Screenshots land on the Desktop by default. Move them in with:
 ---
 
 ## M10 — Presentation + Documentation (5 pts)
+
+The demo itself is scripted step by step in [DEMO.md](DEMO.md).
 
 ### 10.1 Live demo recording
 
