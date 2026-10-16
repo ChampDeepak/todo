@@ -22,7 +22,19 @@ RUN npm run build          # produces /build/dist
 # what is explicitly copied across, so Node and node_modules do not ship.
 # Result: ~50MB instead of ~1.1GB, and a far smaller CVE surface for M6.
 # ============================================================================
-FROM nginx:1.27-alpine
+# Pinned to 1.29-alpine (Alpine 3.23) rather than 1.27-alpine (Alpine 3.21).
+# Trivy failed the pipeline on the older base with 43 HIGH/CRITICAL CVEs,
+# almost all of them OpenSSL 3.3.3 -- the fixes required 3.3.7+. 1.29-alpine
+# ships OpenSSL 3.5.6. The lesson: a CVE in your image is usually not in your
+# code, it is in a base image that has aged.
+FROM nginx:1.29-alpine
+
+# Patches any OS package that received a fix after the base image was built.
+# Trade-off, stated plainly: this makes the build less reproducible, because
+# the same Dockerfile produces different package versions on different days.
+# The alternative is shipping known-vulnerable packages until the base image
+# is rebuilt upstream. For an internet-facing service, patching wins.
+RUN apk upgrade --no-cache
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/dist /usr/share/nginx/html
