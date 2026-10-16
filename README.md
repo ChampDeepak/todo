@@ -7,26 +7,19 @@ Grafana.
 
 ## Demo walkthrough
 
-**[▶ Watch the narrated walkthrough (7:45)](docs/screenshots/m10-demo.mp4)**
-— narrated, with subtitles burned in.
-
-One code change followed end to end: commit and push, the CI pipeline with tests
-and a Trivy scan that blocks on HIGH or CRITICAL findings, a Helm rollout across
-two replicas, a rollback, the Prometheus and Grafana dashboards showing live
-request rate and latency, and finally `terraform destroy` tearing the AWS
-environment down — fifteen resources destroyed, then fifteen to add against the
-empty state, which is the proof it rebuilds from this repository alone.
-
-A transcript is in [`captions.srt`](captions.srt).
-
-
-
-
 https://github.com/user-attachments/assets/aa0b1660-b766-4a36-83b9-467120cefbce
 
+Narrated, with subtitles burned in. One code change followed end to end: commit
+and push, the CI pipeline with tests and a Trivy scan that blocks on HIGH or
+CRITICAL findings, a Helm rollout across two replicas, a rollback, the Prometheus
+and Grafana dashboards showing live request rate and latency, and finally
+`terraform destroy` tearing the AWS environment down — fifteen resources
+destroyed, then fifteen to add against the empty state, which is the proof it
+rebuilds from this repository alone.
 
-
-
+The player above is a downscaled copy that fits GitHub's upload limit. The
+full-quality file is [`docs/screenshots/m10-demo.mp4`](docs/screenshots/m10-demo.mp4)
+(7:45, 1920×1248), and the transcript is in [`captions.srt`](captions.srt).
 
 ---
 
