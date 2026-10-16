@@ -1,0 +1,64 @@
+# Default values. Every environment overrides what it needs via its own values
+# file or --set, and the chart itself never changes between environments.
+
+namespace: taskr
+
+backend:
+  image:
+    repository: todo-backend
+    # The tag is a value, not a constant. In a real deploy this is the git SHA
+    # from M5: `--set backend.image.tag=<sha>`. Rollback is the same command
+    # with the previous SHA.
+    tag: latest
+    # IfNotPresent so kind uses the image loaded onto its nodes. A cluster
+    # pulling from GHCR would use Always for a mutable tag -- but with SHA tags
+    # the image is immutable, so IfNotPresent is correct and faster.
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    port: 8000
+  resources:
+    # requests  -- what the scheduler reserves; it decides which node fits.
+    # limits    -- the hard ceiling. Exceeding a memory limit means the
+    #              container is OOM-killed; exceeding CPU means throttling.
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+frontend:
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    # 8080, because the image runs nginx as a non-root user and an
+    # unprivileged process cannot bind a port below 1024.
+    port: 8080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  database: taskr
+  username: taskr
+  # Demo credential only. In production this comes from an external secret
+  # store (AWS Secrets Manager, External Secrets Operator) and never appears
+  # in a values file that lives in git.
+  password: taskr
+  storage: 1Gi
+
+ingress:
+  enabled: true
+  className: nginx
+  # Empty host = match any hostname, which is what we want for localhost:8080.
+  host: ""

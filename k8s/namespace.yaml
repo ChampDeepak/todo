@@ -1,0 +1,11 @@
+# A namespace is a scope for names plus a boundary for quotas, network policy
+# and RBAC. Putting the app in its own namespace means `kubectl delete
+# namespace taskr` cleanly removes everything, and a future ResourceQuota can
+# cap what this app may consume without touching anything else in the cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: taskr
+  labels:
+    app.kubernetes.io/name: taskr
+    environment: dev
