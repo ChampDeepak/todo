@@ -25,7 +25,8 @@ dist/
 *.tfstate.*
 *.tfvars
 !*.tfvars.example
-.terraform.lock.hcl
+# .terraform.lock.hcl is deliberately NOT ignored: committing it pins provider
+# hashes so CI resolves the identical provider build as your laptop.
 
 # Editor / OS
 .DS_Store

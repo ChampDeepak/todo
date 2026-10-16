@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars and adjust. terraform.tfvars is gitignored.
+#
+# Note what is NOT here: no access key, no secret key. Credentials come from
+# the AWS CLI's own config (`aws configure` / SSO), never from a file in the
+# repo. A committed AWS key is found by scanners within minutes of a push.
+
+aws_region         = "ap-south-1"
+project_name       = "taskr"
+environment        = "dev"
+kubernetes_version = "1.31"
+node_instance_type = "t3.medium"
+node_desired_size  = 2
