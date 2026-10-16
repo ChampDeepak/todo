@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: {{ .Values.namespace }}
+  labels: {{- include "taskr.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        {{- include "taskr.labels" . | nindent 8 }}
+    spec:
+      # Enforced at the platform level, independent of what the Dockerfile
+      # says. runAsNonRoot makes the kubelet REFUSE to start a container whose
+      # image would run as uid 0 -- so a future Dockerfile regression fails
+      # loudly here instead of silently shipping a root container.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DATABASE_URL
+            - name: ENVIRONMENT
+              value: kubernetes
+            - name: CORS_ORIGINS
+              value: "http://localhost:8080"
+          # --- The two probes do different jobs. Confusing them causes outages.
+          # Liveness: "is this process wedged?" Failure RESTARTS the container.
+          # It hits /health, which never touches the database -- otherwise a
+          # 30-second database blip would restart every replica at once.
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 3
+          # Readiness: "can I serve right now?" Failure only removes the pod
+          # from the Service endpoints. No traffic, no restart, free to recover.
+          readinessProbe:
+            httpGet: { path: /health/ready, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          # Startup: gives slow boots room without forcing a long liveness
+          # delay. Migrations run in the entrypoint, so first start is slow;
+          # liveness checks only begin after this one first succeeds.
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 5
+            failureThreshold: 30
+          resources: {{- toYaml .Values.backend.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  # Named exactly "backend" on purpose: the frontend image's nginx.conf
+  # proxies to http://backend:8000, and that same config file is used in
+  # docker compose. One config, three layers, because the name is stable.
+  name: backend
+  namespace: {{ .Values.namespace }}
+  labels: {{- include "taskr.labels" . | nindent 4 }}
+spec:
+  # ClusterIP: reachable only inside the cluster. The Ingress is the single
+  # public entry point, so nothing else needs to be exposed.
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: {{ .Values.backend.service.port }}
+      targetPort: http

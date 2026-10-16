@@ -1,0 +1,44 @@
+{{- if .Values.ingress.enabled }}
+# One entry point for the whole application. The alternative -- a Service of
+# type LoadBalancer per service -- provisions a separate cloud load balancer
+# each time, which costs money per service and gives you a different address
+# per component.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: taskr
+  namespace: {{ .Values.namespace }}
+  labels: {{- include "taskr.labels" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - {{- if .Values.ingress.host }}
+      host: {{ .Values.ingress.host | quote }}
+      {{- end }}
+      http:
+        paths:
+          # /api first for readability. ingress-nginx matches the LONGEST
+          # prefix regardless of order, so /api/tasks reaches the backend and
+          # everything else falls through to the frontend.
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: {{ .Values.backend.service.port }}
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: {{ .Values.backend.service.port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: {{ .Values.frontend.service.port }}
+{{- end }}
