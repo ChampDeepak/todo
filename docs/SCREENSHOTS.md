@@ -29,7 +29,7 @@ Screenshots land on the Desktop by default. Move them in with:
 | M4 — Docker | 2 | ☑ 2 / 2 |
 | M5 — CI/CD | 4 | ☑ 4 / 4 |
 | M6 — DevSecOps | 1 | ☑ 1 / 1 |
-| M7 — Terraform | 6 | ☑ 4 / 6 |
+| M7 — Terraform | 6 | ☑ 6 / 6 |
 | M8 — Kubernetes + Helm | 4 | ☑ 4 / 4 |
 | M9 — Observability | 3 | ☑ 3 / 3 |
 | M10 — Presentation | 1 recording | ☐ 0 / 1 |
@@ -181,7 +181,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 7.1 `terraform plan` output
 
-- [ ] **Save as:** `m7-terraform-plan.png`
+- [x] **Save as:** `m7-terraform-plan.png`  ✅ captured
 - **Capture (do this LAST, after the destroy in 7.4):**
   `cd /Users/deepak/sst/todo/terraform && AWS_PROFILE=project terraform plan`
 - **Must be visible:** the final summary line — `Plan: N to add, 0 to change, 0 to destroy` — with no errors above it.
@@ -244,7 +244,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 7.4 `terraform destroy` completed
 
-- [ ] **Save as:** `m7-terraform-destroy.png`
+- [x] **Save as:** `m7-terraform-destroy.png`  ✅ captured
 - **Capture:** `cd /Users/deepak/sst/todo/terraform && AWS_PROFILE=project terraform destroy` — I will run this for you; capture the final frame
 - **Must be visible:** `Destroy complete! N resources destroyed.` This protects you from a runaway AWS bill *and* is worth 2 points.
 

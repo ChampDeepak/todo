@@ -33,3 +33,6 @@ dist/
 .idea/
 .vscode/
 .kubeconfig-taskr
+# large working video files (final m10-demo.mov is committed deliberately)
+m10-demo-combined.mov
+m10-demo-combined-noNotes.mov
