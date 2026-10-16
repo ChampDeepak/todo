@@ -14,7 +14,11 @@ Prometheus and Grafana dashboards, and finally `terraform destroy` tearing the
 AWS environment down to nothing.
 
 
-https://github.com/user-attachments/assets/9923c544-4425-48e8-aca4-b9e5eaff220b
+
+
+https://github.com/user-attachments/assets/aa0b1660-b766-4a36-83b9-467120cefbce
+
+
 
 
 
