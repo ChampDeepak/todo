@@ -7,6 +7,7 @@ Grafana.
 
 **Repository:** <https://github.com/ChampDeepak/todo>
 **CI pipeline:** <https://github.com/ChampDeepak/todo/actions>
+**Latest green run:** <https://github.com/ChampDeepak/todo/actions/runs/38936686470>
 **Submission evidence:** [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 
 ---
