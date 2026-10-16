@@ -1,0 +1,203 @@
+name: CI
+
+# The pipeline's trigger. A push to main is the event that starts everything;
+# pull_request gives the same gates before merge, which is where you actually
+# want to catch a failure.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Least privilege. GITHUB_TOKEN is generated per run and expires when the run
+# ends -- unlike a personal access token, which lives until someone revokes it.
+permissions:
+  contents: read
+  packages: write
+
+# A new push to the same branch cancels the in-flight run. Without this, ten
+# pushes queue ten full pipelines and you wait for the stale ones.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # GATE 1 -- cheapest and most likely to fail, so it runs first.
+  # ===========================================================================
+  test:
+    name: Lint and test
+    runs-on: ubuntu-latest
+
+    # A real Postgres for the duration of the job. The suite creates and drops
+    # its own database inside it. SQLite would be faster but would not catch a
+    # Postgres-specific failure, which is the entire point of a pre-deploy gate.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: taskr
+          POSTGRES_PASSWORD: taskr
+          POSTGRES_DB: taskr
+        ports:
+          - 5432:5432
+        # The job must not start testing before Postgres accepts connections.
+        options: >-
+          --health-cmd "pg_isready -U taskr"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          # Caches the pip tree keyed on the lockfile hash. Unchanged
+          # dependencies turn a ~40s install into ~3s.
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Lint
+        working-directory: backend
+        run: ruff check .
+
+      - name: Run tests
+        working-directory: backend
+        env:
+          # The suite connects here to CREATE DATABASE for its own test run.
+          TEST_ADMIN_URL: postgresql+psycopg://taskr:taskr@localhost:5432/postgres
+        # A non-zero exit from pytest fails this job, which blocks every job
+        # below. That is the gate.
+        run: pytest -v
+
+  # ===========================================================================
+  # GATE 2 -- runs in parallel with tests; nothing depends on the other.
+  # ===========================================================================
+  build-frontend:
+    name: Build frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # npm ci, not npm install: installs exactly what the lockfile pins and
+      # fails if package.json and the lockfile disagree. A build must be
+      # reproducible, not "whatever resolved today".
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+
+  # ===========================================================================
+  # Only reached when both gates above are green. Builds, scans, then pushes.
+  # ===========================================================================
+  build-and-push:
+    name: Build, scan and push ${{ matrix.component }}
+    runs-on: ubuntu-latest
+    needs: [test, build-frontend]
+
+    strategy:
+      # Both images build independently; a failure in one should not hide the
+      # other's result.
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # GHCR image names must be lowercase, and this repo's owner is not.
+      - name: Compute image name
+        id: img
+        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')-${{ matrix.component }}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Derives tags from the git context. type=sha with format=long produces
+      # the full commit SHA as the tag. `latest` is applied only on main, as a
+      # convenience pointer -- the SHA tag is the real identity, and it is what
+      # makes a rollback possible.
+      - name: Derive tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.img.outputs.name }}
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Build into the local daemon WITHOUT pushing, so Trivy can scan the
+      # exact artefact before it is published. Scanning after the push would
+      # mean a vulnerable image is already available to pull.
+      - name: Build image (local, not pushed)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.component }}
+          load: true
+          push: false
+          tags: ${{ steps.img.outputs.name }}:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ---- M6: the security gate ----
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.img.outputs.name }}:ci
+          format: table
+          # The gate: a HIGH or CRITICAL finding fails the job, so the image is
+          # never pushed. UNKNOWN/LOW/MEDIUM are reported but do not block.
+          exit-code: "1"
+          severity: HIGH,CRITICAL
+          # Only report vulnerabilities that actually have a fix available.
+          # A CVE with no patch cannot be acted on, so blocking on it just
+          # teaches people to disable the scanner.
+          ignore-unfixed: true
+
+      # Reached only if Trivy passed. Rebuilds from the layer cache, so this is
+      # seconds, not a second full build.
+      - name: Push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.component }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Report what was published
+        run: |
+          echo "### Published \`${{ matrix.component }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.meta.outputs.tags }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
