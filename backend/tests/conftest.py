@@ -26,9 +26,9 @@ TEST_URL = ADMIN_URL.rsplit("/", 1)[0] + f"/{TEST_DB_NAME}"
 # Set before importing the app so its engine is built against the test database.
 os.environ["DATABASE_URL"] = TEST_URL
 
+from app import models  # noqa: E402,F401 - registers tables on Base.metadata
 from app.database import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
-from app import models  # noqa: E402,F401 - registers tables on Base.metadata
 
 
 @pytest.fixture(scope="session")

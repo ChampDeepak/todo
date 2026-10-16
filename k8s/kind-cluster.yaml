@@ -1,0 +1,28 @@
+# kind = Kubernetes IN Docker. Each "node" is a container running a real
+# kubelet, so this is a genuine Kubernetes cluster, not a simulator. The API
+# server, scheduler and controller-manager are the same binaries EKS runs.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: taskr
+
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      # The ingress-nginx controller only schedules onto a node carrying this
+      # label. Without it the controller pod sits Pending forever.
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      # Maps your Mac's port 8080 to port 80 inside the node container, so the
+      # Ingress is reachable from the browser. On a cloud cluster this job is
+      # done by a real load balancer instead.
+      - containerPort: 80
+        hostPort: 8080
+        protocol: TCP
+  # Two workers, so a Deployment with 2 replicas genuinely spreads across nodes
+  # rather than both landing on the same machine.
+  - role: worker
+  - role: worker
