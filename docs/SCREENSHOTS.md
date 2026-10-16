@@ -32,7 +32,7 @@ Screenshots land on the Desktop by default. Move them in with:
 | M7 — Terraform | 6 | ☑ 6 / 6 |
 | M8 — Kubernetes + Helm | 4 | ☑ 4 / 4 |
 | M9 — Observability | 3 | ☑ 3 / 3 |
-| M10 — Presentation | 1 recording | ☐ 0 / 1 |
+| M10 — Presentation | 1 recording | ☑ 1 / 1 |
 | **Total** | **21 + 1 recording** | |
 
 ---
@@ -341,7 +341,10 @@ The demo itself is scripted step by step in [DEMO.md](DEMO.md).
 
 ### 10.1 Live demo recording
 
-- [ ] **Save as:** `m10-demo.mov` (only if presenting remotely)
+- [x] **Save as:** `m10-demo.mov`  ✅ captured — 7:45, narrated, committed
+- **What it covers:** the deploy loop (code change → push → CI → Helm rollout →
+  rollback), the observability stack, and the cloud teardown ending on
+  `Destroy complete! 15 resources destroyed` and `Plan: 15 to add`.
 - **Capture:** commit a change → the pipeline runs → the deployment updates with the new image.
 - **Must be visible:** all three stages, as one continuous story.
 
