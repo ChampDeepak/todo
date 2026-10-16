@@ -1,0 +1,14 @@
+# Direct dependencies only. Pinned, resolved versions live in requirements.txt.
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+psycopg[binary]
+pydantic
+pydantic-settings
+prometheus-fastapi-instrumentator
+pytest
+httpx
+pytest
+httpx
+ruff
