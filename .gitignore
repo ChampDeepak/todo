@@ -1,0 +1,33 @@
+# Secrets — never commit. M6/M7 are graded on this.
+.env
+*.env
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+*.log
+
+# Terraform — state files contain resource IDs and sometimes secrets in plain text
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
