@@ -1,0 +1,18 @@
+# Lint + format config. Runs as its own CI job in M5: style failures should be
+# visible without blocking the test signal.
+line-length = 100
+target-version = "py312"
+# Alembic's generated files follow its own conventions, not ours.
+extend-exclude = ["alembic/versions", ".venv"]
+
+[lint]
+select = ["E", "F", "I", "UP", "B"]  # pycodestyle, pyflakes, isort, pyupgrade, bugbear
+ignore = [
+    # B008 flags a function call in a default argument. That is exactly how
+    # FastAPI declares dependencies (`db: Session = Depends(get_db)`), so the
+    # rule is wrong for this framework rather than the code being wrong.
+    "B008",
+    # UP042 wants `enum.StrEnum`. We keep `(str, enum.Enum)` because that is
+    # what SQLAlchemy's Enum type is tested against across versions.
+    "UP042",
+]
