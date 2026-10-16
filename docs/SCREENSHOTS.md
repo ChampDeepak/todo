@@ -54,7 +54,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 2.1 Pytest passing
 
 - [ ] **Save as:** `m2-pytest-passing.png`
-- **Capture:** the terminal after `cd backend && .venv/bin/pytest -v`
+- **Capture:** the terminal after `cd /Users/deepak/sst/todo/backend && .venv/bin/pytest -v`. Needs the compose Postgres running on port 5433, which it is.
 - **Must be visible:** the full command, every test name with `PASSED`, and the green summary line (`N passed in Xs`). Scroll so the summary and at least 5 test names are in one frame.
 
 ![M2 pytest output](screenshots/m2-pytest-passing.png)
@@ -66,7 +66,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 3.1 Commit history
 
 - [ ] **Save as:** `m3-commit-history.png`
-- **Capture:** the GitHub repo's commits page (`https://github.com/<user>/<repo>/commits/main`)
+- **Capture:** <https://github.com/ChampDeepak/todo/commits/main>
 - **Must be visible:** **at least 10 commits** with meaningful messages. The rubric explicitly rejects "update", "fix", "test" as messages.
 
 ![M3 commit history](screenshots/m3-commit-history.png)
@@ -78,7 +78,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 4.1 `docker compose up --build` succeeding
 
 - [ ] **Save as:** `m4-compose-up.png`
-- **Capture:** terminal running `docker compose up --build`
+- **Capture:** `cd /Users/deepak/sst/todo && docker compose ps` (the stack is already built and healthy), or re-run `docker compose up --build` for the full build log
 - **Must be visible:** all three services (`db`, `backend`, `frontend`) reaching a started/healthy state in the same frame.
 
 ![M4 docker compose up](screenshots/m4-compose-up.png)
@@ -99,7 +99,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 - [ ] **Save as:** `m5-actions-green.png`
 - [ ] **Also record the run URL** in `README.md`
-- **Capture:** the Actions run summary page for a push to `main`
+- **Capture:** <https://github.com/ChampDeepak/todo/actions> → the most recent green run on `main`
 - **Must be visible:** every job green, including the test job, the frontend build, and both image builds.
 
 ![M5 green pipeline](screenshots/m5-actions-green.png)
@@ -107,7 +107,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 5.2 GHCR packages with SHA tags
 
 - [ ] **Save as:** `m5-ghcr-packages.png`
-- **Capture:** the GitHub Packages page for the repo
+- **Capture:** <https://github.com/ChampDeepak?tab=packages> → `todo-backend` and `todo-frontend`
 - **Must be visible:** both images published, tagged with the **Git commit SHA**. A screenshot showing only `latest` loses the 2 points for SHA-based tags.
 
 ![M5 GHCR packages](screenshots/m5-ghcr-packages.png)
@@ -192,8 +192,9 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 8.4 Application through the Ingress
 
 - [ ] **Save as:** `m8-app-ingress.png`
-- **Capture:** the app in a browser via the Ingress hostname or LoadBalancer IP
-- **Must be visible:** the URL bar showing the **Ingress address, not `localhost:3000`** — this is what proves `/` routes to the frontend and `/api` to the backend.
+- **Capture:** <http://localhost:8080> — the kind cluster maps your Mac's port 8080 to the Ingress controller inside the cluster.
+- **Must be visible:** the URL bar showing **`localhost:8080`, not `localhost:3000`**. Port 3000 is the docker-compose stack from M4; 8080 is Kubernetes. Showing the wrong one loses the point.
+- **First run this in your own terminal:** `kind export kubeconfig --name taskr`
 
 ![M8 app via Ingress](screenshots/m8-app-ingress.png)
 
@@ -204,7 +205,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 9.1 `/metrics` endpoint
 
 - [ ] **Save as:** `m9-metrics-curl.png`
-- **Capture:** `curl http://<backend>/metrics`
+- **Capture:** `kubectl exec -n taskr deploy/backend -- python -c "import urllib.request;print(urllib.request.urlopen('http://127.0.0.1:8000/metrics').read().decode()[:1500])"`
 - **Must be visible:** Prometheus text format — `# HELP` / `# TYPE` lines and real counter values.
 
 ![M9 metrics endpoint](screenshots/m9-metrics-curl.png)
@@ -212,7 +213,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 9.2 Prometheus targets
 
 - [ ] **Save as:** `m9-prometheus-targets.png`
-- **Capture:** Prometheus UI → *Status* → *Targets*
+- **Capture:** <http://prometheus.localtest.me:8080> → *Status* → *Target health*. `localtest.me` resolves to 127.0.0.1, so no `/etc/hosts` edit is needed.
 - **Must be visible:** the application target with state **`UP`** and a recent scrape time.
 
 ![M9 Prometheus targets](screenshots/m9-prometheus-targets.png)
@@ -220,7 +221,7 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 9.3 Grafana dashboard
 
 - [ ] **Save as:** `m9-grafana-dashboard.png`
-- **Capture:** the Grafana dashboard
+- **Capture:** <http://grafana.localtest.me:8080>, login `admin` / `admin`
 - **Must be visible:** at least one panel with **actual plotted data** — request rate, latency, or error rate. An empty panel scores zero for this criterion, so generate traffic against the app first.
 
 ![M9 Grafana dashboard](screenshots/m9-grafana-dashboard.png)

@@ -1,0 +1,60 @@
+# Values for the kube-prometheus-stack chart, which bundles Prometheus, Grafana,
+# Alertmanager and the operator that manages them.
+#
+# Sized down for a laptop kind cluster. A production install would use far
+# larger retention, persistent volumes, and real alert routing.
+
+# --- Prometheus ------------------------------------------------------------
+prometheus:
+  prometheusSpec:
+    retention: 2h
+    # By default the operator only scrapes ServiceMonitors carrying its own
+    # release label. Setting these to false makes it pick up ANY ServiceMonitor
+    # in the cluster, including ours in the taskr namespace. Convenient here;
+    # in a large cluster you would keep the label selector and label your
+    # ServiceMonitors properly, so one team cannot accidentally flood another
+    # team's Prometheus.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    resources:
+      requests: { cpu: 100m, memory: 400Mi }
+      limits:   { cpu: 1000m, memory: 1Gi }
+  # Reachable at http://prometheus.localtest.me:8080 -- localtest.me resolves
+  # to 127.0.0.1, so no /etc/hosts edit is needed.
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts: [prometheus.localtest.me]
+    paths: ["/"]
+    pathType: Prefix
+
+# --- Grafana ---------------------------------------------------------------
+grafana:
+  adminPassword: admin
+  # The operator wires Prometheus in as the default datasource automatically.
+  defaultDashboardsEnabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts: [grafana.localtest.me]
+    path: /
+    pathType: Prefix
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits:   { cpu: 500m, memory: 512Mi }
+
+# --- Trimmed for a laptop --------------------------------------------------
+alertmanager:
+  enabled: false        # no alert routing to demonstrate tonight
+kubeStateMetrics:
+  enabled: true         # cluster object state: pod counts, deployment status
+nodeExporter:
+  enabled: true         # node CPU, memory, disk
+# These scrape control-plane components that kind does not expose on the
+# expected addresses, so leaving them on produces permanently-DOWN targets
+# that make the Targets page look broken.
+kubeControllerManager: { enabled: false }
+kubeScheduler:         { enabled: false }
+kubeProxy:             { enabled: false }
+kubeEtcd:              { enabled: false }

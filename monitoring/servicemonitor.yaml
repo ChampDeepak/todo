@@ -1,0 +1,24 @@
+# A ServiceMonitor is a custom resource the Prometheus Operator watches. It is
+# the declarative form of "scrape this".
+#
+# Note what it selects: a *Service*, not pods directly. Prometheus then resolves
+# that Service's endpoints and scrapes each pod individually -- so with 2
+# backend replicas you get 2 targets and per-pod metrics, rather than metrics
+# from whichever pod the load balancer happened to pick.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: taskr-backend
+  namespace: taskr
+  labels:
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  namespaceSelector:
+    matchNames: [taskr]
+  endpoints:
+    - port: http          # the named port on the backend Service
+      path: /metrics
+      interval: 15s

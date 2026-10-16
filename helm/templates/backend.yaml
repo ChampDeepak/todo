@@ -73,7 +73,12 @@ metadata:
   # docker compose. One config, three layers, because the name is stable.
   name: backend
   namespace: {{ .Values.namespace }}
-  labels: {{- include "taskr.labels" . | nindent 4 }}
+  labels:
+    # app: backend is what the ServiceMonitor in monitoring/ selects on. The
+    # shared taskr labels are not specific enough -- they also match the
+    # frontend, which has no /metrics endpoint to scrape.
+    app: backend
+    {{- include "taskr.labels" . | nindent 4 }}
 spec:
   # ClusterIP: reachable only inside the cluster. The Ingress is the single
   # public entry point, so nothing else needs to be exposed.
