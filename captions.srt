@@ -1,0 +1,211 @@
+1
+00:00:00,750 --> 00:00:12,350
+This is Taskr, a task tracker with React frontend, FastAPI backend, and PostgreSQL database running in Kubernetes behind an Ingress.
+
+2
+00:00:12,350 --> 00:00:26,400
+The application is deliberately simple. What matters is everything around it. The pipeline that tests it, the scanner that gates it, and the cluster that runs it, and the AWS infrastructure that exists only as code.
+
+3
+00:00:26,400 --> 00:00:34,400
+I'm going to change one line and follow it all the way into a running pod.
+
+4
+00:00:34,400 --> 00:00:46,020
+An ordinary code change, one line in a React component, I commit it and I push. The push is the trigger. Nothing else starts this pipeline.
+
+5
+00:00:46,020 --> 00:00:57,220
+And from here, no human is in the loop. So, idea is simple. Whenever new commit arrives on the main, trigger the pipeline,
+
+6
+00:00:57,220 --> 00:01:06,850
+do the checks, and after checks, basically deploy in the production. There are total 4 jobs.
+
+7
+00:01:06,850 --> 00:01:14,770
+32 tests run against a real Postgres. If any fail, nothing below runs, and no image is even built.
+
+8
+00:01:14,770 --> 00:01:27,280
+Then Trivy scans both images for high and critical vulnerabilities, and an image is pushed only if its scan passes.
+
+9
+00:01:27,280 --> 00:01:37,490
+That gate is not decorative. It blocked an earlier build over a critical OpenSSL flaw in the nginx base image.
+
+10
+00:01:37,490 --> 00:01:46,050
+And which is why there is a commit in this history that does nothing but change a base image.
+
+11
+00:01:46,050 --> 00:01:53,890
+So, here is the green. I tag the local image with the commit SHA, and we are using sha because
+
+12
+00:01:54,770 --> 00:02:03,360
+it gives us exact version and it will help us when we want to roll back.
+
+13
+00:02:06,030 --> 00:02:13,230
+Side load, so commit SHA and the side load it into this cluster and that stuff only exists because
+
+14
+00:02:13,230 --> 00:02:21,600
+this is a local kind cluster with no registry credentials. In a cloud cluster, the nodes pull
+
+15
+00:02:21,600 --> 00:02:31,300
+straight from the registry. So, there we do not need this step because cloud clusters will
+
+16
+00:02:31,300 --> 00:02:43,520
+by default pull the nodes from the registry. Now comes the bridging part, the deploy itself.
+
+17
+00:02:45,980 --> 00:02:52,180
+One command, the chart does not change, only the image tag. passed as a parameter,
+
+18
+00:02:52,180 --> 00:02:59,840
+two replicas replaced one at a time. And the readiness probe has to pass before the old
+
+19
+00:02:59,840 --> 00:03:07,890
+pod is removed. So, the app keeps serving throughout. So, because we have two replicas,
+
+20
+00:03:07,890 --> 00:03:14,770
+idea is simple. Divert the traffic to the old replica and like change the current replica.
+
+21
+00:03:17,040 --> 00:03:23,870
+And because every image carries its commit SHA rolling back is a simple command. With latest,
+
+22
+00:03:25,230 --> 00:03:30,670
+there would be no previous version to return to. That is the real argument against it,
+
+23
+00:03:34,370 --> 00:03:42,530
+the running app. So, that is the loop. Now, let's look at what it produced and how we know
+
+24
+00:03:42,530 --> 00:03:50,940
+it is healthy. Here is the app again with task created, the live, the stats bar updates from 11
+
+25
+00:03:50,940 --> 00:04:02,540
+to 12. Prometheus targets. Prometheus discovers backend through the ServiceMonitor and it scrapes
+
+26
+00:04:02,540 --> 00:04:12,830
+each pod individually. Not the service behind them. If one replica degrades,
+
+27
+00:04:12,830 --> 00:04:19,740
+I can see which one. Prometheus provides us basic observability, not just basic observability,
+
+28
+00:04:19,740 --> 00:04:30,160
+but like we use it for making our applications more observable. Now, we will talk about
+
+29
+00:04:30,160 --> 00:04:39,300
+Grafana, live application metrics requested for endpoint. It tells about p50, which is basically
+
+30
+00:04:40,020 --> 00:04:46,580
+telling that, okay, if I'm saying that latency is p50 or my p50 latency is five seconds,
+
+31
+00:04:46,580 --> 00:04:52,590
+then it means that 50% of the population is taking less than or equal to five seconds.
+
+32
+00:04:54,820 --> 00:05:00,660
+Grafana also tells us about latency, responses by status code and memory per pod.
+
+33
+00:05:00,660 --> 00:05:09,200
+The rate is climbing because the traffic is arriving right now. And the 4xx series is
+
+34
+00:05:09,200 --> 00:05:16,900
+real or request with the invalid status filter correctly rejected as a 422. The pipeline that
+
+35
+00:05:16,900 --> 00:05:24,260
+produces all of this lint and test and build frontend and then build, scan and push both images.
+
+36
+00:05:24,260 --> 00:05:30,370
+This is the GitHub actions. Both images published to GitHub container registry
+
+37
+00:05:31,780 --> 00:05:38,060
+can tagged with the commit SHA rather than latest. The commit, the image and the
+
+38
+00:05:38,060 --> 00:05:48,270
+running pod all carry one identifier. That is the SHA. If we see the commit history,
+
+39
+00:05:49,170 --> 00:05:59,500
+28 commits and each describing or real change. So, initially, we started with some setup commits
+
+40
+00:05:59,500 --> 00:06:06,350
+and eventually, we added the commits related with the infra. Now, let's start with the
+
+41
+00:06:06,350 --> 00:06:14,620
+Terraform Destroy part. Finally, the infrastructure. 15 resources are hosted on AWS. Terraform works
+
+42
+00:06:14,620 --> 00:06:21,200
+out the deletion order itself. We does not need to define the dependency and order by
+
+43
+00:06:21,200 --> 00:06:30,430
+ourself. Terraform will by default figure out the way. I never wrote the ordering
+
+44
+00:06:30,430 --> 00:06:35,550
+anywhere. It comes from the dependency graph. That is the whole argument for declaring
+
+45
+00:06:35,550 --> 00:06:44,620
+infrastructure instead of clicking it. Here the destroy is about to complete.
+
+46
+00:06:45,550 --> 00:06:51,780
+And once it is completed, it will show that our successful message. Yeah, it completed.
+
+47
+00:06:53,470 --> 00:07:03,070
+The EKS control plane takes nearly three minutes, then the subnets, the VPC and IAM roles. Destroy complete
+
+48
+00:07:03,070 --> 00:07:13,060
+15 resources destroyed. Nothing is left. Once the destroy is closed, we will like
+
+49
+00:07:13,060 --> 00:07:18,660
+run off Terraform plan command. And that is proof of reproducibility.
+
+50
+00:07:20,030 --> 00:07:27,300
+Against empty state, the same configuration plans 15 to add, 15 destroyed, 15 to add,
+
+51
+00:07:27,300 --> 00:07:32,820
+the same number both ways. One line of code became more tested, scanned a SHA-tagged image
+
+52
+00:07:33,460 --> 00:07:39,860
+on two replicas behind an Ingress with its metrics on a dashboard and cloud environments.
+
+53
+00:07:39,860 --> 00:07:43,380
+It ran on, was created and destroyed entirely from code.
