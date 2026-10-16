@@ -7,13 +7,11 @@ Grafana.
 
 ## Demo walkthrough
 
-**[▶ Watch the narrated walkthrough (7:45)](docs/screenshots/m10-demo.mov)**
+**[▶ Watch the narrated walkthrough (7:45)](docs/screenshots/m10-demo.mp4)**
 — one code change followed end to end: commit and push, the CI pipeline with
 tests and a Trivy scan, a Helm rollout across two replicas, a rollback, the
 Prometheus and Grafana dashboards, and finally `terraform destroy` tearing the
 AWS environment down to nothing.
-
-GitHub does not play `.mov` files inline — the link downloads it.
 
 ---
 
