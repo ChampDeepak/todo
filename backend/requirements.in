@@ -9,6 +9,4 @@ pydantic-settings
 prometheus-fastapi-instrumentator
 pytest
 httpx
-pytest
-httpx
 ruff

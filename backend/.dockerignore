@@ -1,0 +1,16 @@
+# .gitignore does NOT apply to docker build. Without this file, `COPY . .`
+# would bake .env, the virtualenv and the whole .git history into the image.
+.env
+*.env
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.git/
+.gitignore
+tests/

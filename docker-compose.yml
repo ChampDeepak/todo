@@ -1,4 +1,10 @@
-# Local development stack. Extended with frontend/backend services in M4.
+# Full three-tier stack. `docker compose up --build` starts database, API and
+# web server with no other setup on the machine.
+#
+# Host port choices: 5433 and 8001 because another project on this machine
+# already owns 5432 and 8000. Inside the compose network the services always
+# reach each other on their real ports (db:5432, backend:8000) by service name,
+# so the host mapping is purely a convenience for your browser and psql.
 services:
   db:
     image: postgres:16-alpine
@@ -8,8 +14,6 @@ services:
       POSTGRES_PASSWORD: taskr
       POSTGRES_DB: taskr
     ports:
-      # Host port 5433 because another project on this machine already owns 5432.
-      # Inside the compose network the service is still reached as db:5432.
       - "5433:5432"
     volumes:
       # Named volume: the database survives `docker compose down`. Without it
@@ -17,12 +21,43 @@ services:
       # your migrations are not idempotent.
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      # Compose uses this to decide when the database is genuinely accepting
-      # connections. "Container started" is not the same as "ready".
+      # "Container started" is not "ready to accept connections". pg_isready is
+      # what tells compose the difference.
       test: ["CMD-SHELL", "pg_isready -U taskr -d taskr"]
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: taskr-backend
+    environment:
+      # db:5432 -- the service name, resolved by compose's internal DNS. Never
+      # localhost: inside a container, localhost is that container.
+      DATABASE_URL: postgresql+psycopg://taskr:taskr@db:5432/taskr
+      CORS_ORIGINS: http://localhost:3000
+      ENVIRONMENT: docker
+    depends_on:
+      db:
+        # service_healthy, not just service_started. Otherwise the backend
+        # races Postgres' startup and the first migration fails.
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: taskr-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      # 8080 inside, because a non-root process cannot bind a port below 1024.
+      - "3000:8080"
+    restart: unless-stopped
 
 volumes:
   pgdata:
