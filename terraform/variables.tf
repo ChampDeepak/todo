@@ -29,13 +29,13 @@ variable "kubernetes_version" {
 }
 
 variable "node_instance_type" {
-  description = "Worker node size. t3.medium is the practical floor for EKS: smaller types have a low ENI limit and therefore a low max-pods."
+  description = "Worker node size. t3.small, not t3.medium: this AWS account is Free Tier-restricted and refuses to launch any instance type outside the free-tier list, which t3.medium is not on. t3.small gives 2 vCPU / 2 GiB and an ENI limit allowing 11 pods per node -- enough for the system pods plus this application."
   type        = string
-  default     = "t3.medium"
+  default     = "t3.small"
 }
 
 variable "node_desired_size" {
-  description = "Number of worker nodes. 2 x t3.medium = 4 vCPUs, which fits inside a new AWS account's default 5-vCPU on-demand quota."
+  description = "Number of worker nodes. 2 x t3.small = 2 vCPUs, well inside a new AWS account's default 5-vCPU on-demand quota. Two nodes, not one, so the node group demonstrates scheduling across availability zones."
   type        = number
   default     = 2
 }

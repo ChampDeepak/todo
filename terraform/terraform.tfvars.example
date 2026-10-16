@@ -8,5 +8,7 @@ aws_region         = "ap-south-1"
 project_name       = "taskr"
 environment        = "dev"
 kubernetes_version = "1.31"
-node_instance_type = "t3.medium"
+# t3.small, not t3.medium: a Free Tier-restricted AWS account refuses to launch
+# any instance type that is not free-tier eligible.
+node_instance_type = "t3.small"
 node_desired_size  = 2
