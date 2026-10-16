@@ -5,9 +5,21 @@ containerised, tested in CI, scanned for vulnerabilities, provisioned with
 Terraform, deployed to Kubernetes with Helm, and monitored with Prometheus and
 Grafana.
 
+## Demo walkthrough
+
+**[▶ Watch the narrated walkthrough (7:45)](docs/screenshots/m10-demo.mov)**
+— one code change followed end to end: commit and push, the CI pipeline with
+tests and a Trivy scan, a Helm rollout across two replicas, a rollback, the
+Prometheus and Grafana dashboards, and finally `terraform destroy` tearing the
+AWS environment down to nothing.
+
+GitHub does not play `.mov` files inline — the link downloads it.
+
+---
+
 **Repository:** <https://github.com/ChampDeepak/todo>
 **CI pipeline:** <https://github.com/ChampDeepak/todo/actions>
-**Latest green run:** <https://github.com/ChampDeepak/todo/actions/runs/38936686470>
+**Latest green run:** <https://github.com/ChampDeepak/todo/actions/runs/38970270985>
 **Submission evidence:** [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 
 ---

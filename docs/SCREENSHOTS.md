@@ -1,42 +1,5 @@
 # Submission Evidence — Screenshot Tracker
 
-Every screenshot the rubric asks for, in one place. Save each file into
-`docs/screenshots/` using **exactly** the filename in the `Save as` column — the
-image links below are already written against those names, so a correctly named
-file makes the entry render automatically.
-
-**How to capture on macOS**
-
-| Need | How |
-|---|---|
-| A region | `Cmd+Shift+4`, then drag |
-| A single window, with shadow | `Cmd+Shift+4`, then `Space`, then click the window |
-| A screen recording | `Cmd+Shift+5` → *Record Selected Portion* |
-| From the terminal, no mouse | `screencapture -w docs/screenshots/NAME.png` (click target window) |
-
-Screenshots land on the Desktop by default. Move them in with:
-`mv ~/Desktop/"Screenshot "*.png docs/screenshots/NAME.png`
-
----
-
-## Progress
-
-| Module | Evidence needed | Captured |
-|---|---|---|
-| M1 — Application | 1 | ☑ 1 / 1 |
-| M2 — Testing | 1 | ☑ 1 / 1 |
-| M3 — Git & GitHub | 1 | ☑ 1 / 1 |
-| M4 — Docker | 2 | ☑ 2 / 2 |
-| M5 — CI/CD | 4 | ☑ 4 / 4 |
-| M6 — DevSecOps | 1 | ☑ 1 / 1 |
-| M7 — Terraform | 6 | ☑ 6 / 6 |
-| M8 — Kubernetes + Helm | 4 | ☑ 4 / 4 |
-| M9 — Observability | 3 | ☑ 3 / 3 |
-| M10 — Presentation | 1 recording | ☑ 1 / 1 |
-| **Total** | **21 + 1 recording** | |
-
----
-
 ## M1 — Application (10 pts)
 
 ### 1.1 Application running in the browser
@@ -337,7 +300,6 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ## M10 — Presentation + Documentation (5 pts)
 
-The demo itself is scripted step by step in [DEMO.md](DEMO.md).
 
 ### 10.1 Live demo recording
 
