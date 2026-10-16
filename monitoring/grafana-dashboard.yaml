@@ -1,0 +1,99 @@
+# A dashboard shipped as a ConfigMap.
+#
+# Grafana's sidecar watches every namespace for ConfigMaps carrying the label
+# `grafana_dashboard: "1"` and loads their contents. That means the dashboard
+# lives in git and is deployed like any other object -- not clicked together in
+# the UI, where it exists only until someone deletes the pod.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: taskr-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  taskr.json: |
+    {
+      "title": "Taskr — Application",
+      "uid": "taskr-app",
+      "timezone": "browser",
+      "refresh": "10s",
+      "time": { "from": "now-30m", "to": "now" },
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Request rate by endpoint (req/s)",
+          "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+          "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+          "targets": [
+            {
+              "expr": "sum by (handler) (rate(http_requests_total{namespace=\"taskr\"}[1m]))",
+              "legendFormat": "{{handler}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Latency p50 / p95 / p99 (seconds)",
+          "description": "Computed from the histogram. Averages hide the tail: a p50 of 50ms with a p99 of 9s averages to something that looks fine while 1% of users time out.",
+          "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+          "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.50, sum by (le) (rate(http_request_duration_seconds_bucket{namespace=\"taskr\"}[5m])))",
+              "legendFormat": "p50", "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace=\"taskr\"}[5m])))",
+              "legendFormat": "p95", "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{namespace=\"taskr\"}[5m])))",
+              "legendFormat": "p99", "refId": "C"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Responses by status code",
+          "description": "4xx is a client problem, 5xx is yours. Splitting them is what stops a flood of 404s from masking a real 500.",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
+          "targets": [
+            {
+              "expr": "sum by (status) (rate(http_requests_total{namespace=\"taskr\"}[1m]))",
+              "legendFormat": "{{status}}", "refId": "A"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Backend pods being scraped",
+          "description": "One target per pod. If this drops below the replica count, a pod is unreachable.",
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 9 },
+          "targets": [
+            { "expr": "count(up{namespace=\"taskr\"} == 1)", "refId": "A" }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Total requests served",
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 9 },
+          "targets": [
+            { "expr": "sum(http_requests_total{namespace=\"taskr\"})", "refId": "A" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Backend memory per pod (RSS)",
+          "gridPos": { "h": 4, "w": 12, "x": 12, "y": 13 },
+          "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+          "targets": [
+            {
+              "expr": "process_resident_memory_bytes{namespace=\"taskr\"}",
+              "legendFormat": "{{pod}}", "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
