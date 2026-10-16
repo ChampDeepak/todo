@@ -23,17 +23,17 @@ Screenshots land on the Desktop by default. Move them in with:
 
 | Module | Evidence needed | Captured |
 |---|---|---|
-| M1 — Application | 1 | ☐ 0 / 1 |
+| M1 — Application | 1 | ☑ 1 / 1 |
 | M2 — Testing | 1 | ☐ 0 / 1 |
-| M3 — Git & GitHub | 1 | ☐ 0 / 1 |
-| M4 — Docker | 2 | ☐ 0 / 2 |
-| M5 — CI/CD | 2 | ☐ 0 / 2 |
+| M3 — Git & GitHub | 1 | ☑ 1 / 1 |
+| M4 — Docker | 2 | ☐ 1 / 2 |
+| M5 — CI/CD | 4 | ☑ 4 / 4 |
 | M6 — DevSecOps | 1 | ☐ 0 / 1 |
-| M7 — Terraform | 4 | ☐ 0 / 4 |
-| M8 — Kubernetes + Helm | 4 | ☐ 0 / 4 |
-| M9 — Observability | 3 | ☐ 0 / 3 |
+| M7 — Terraform | 6 | ☑ 4 / 6 |
+| M8 — Kubernetes + Helm | 4 | ☐ 1 / 4 |
+| M9 — Observability | 3 | ☐ 2 / 3 |
 | M10 — Presentation | 1 recording | ☐ 0 / 1 |
-| **Total** | **19 + 1 recording** | |
+| **Total** | **21 + 1 recording** | |
 
 ---
 
@@ -41,7 +41,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 1.1 Application running in the browser
 
-- [ ] **Save as:** `m1-app-browser.png`
+- [x] **Save as:** `m1-app-browser.png`  ✅ captured
 - **Capture:** open <http://localhost:3000>, show the task list with several tasks, the stats bar, and the create form.
 - **Must be visible:** the URL bar showing `localhost:3000`, and a UI that is clearly not blank — the rubric gives 1 point for "responsive and usable UI (not a blank page)".
 
@@ -65,7 +65,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 3.1 Commit history
 
-- [ ] **Save as:** `m3-commit-history.png`
+- [x] **Save as:** `m3-commit-history.png`  ✅ captured
 - **Capture:** <https://github.com/ChampDeepak/todo/commits/main>
 - **Must be visible:** **at least 10 commits** with meaningful messages. The rubric explicitly rejects "update", "fix", "test" as messages.
 
@@ -85,7 +85,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 4.2 Application served from the container stack
 
-- [ ] **Save as:** `m4-app-browser.png`
+- [x] **Save as:** `m4-app-browser.png`  ✅ captured
 - **Capture:** <http://localhost:3000> while the compose stack is serving it (not the Vite dev server).
 - **Must be visible:** the URL bar and a working app. This is a *different* screenshot from M1 — here the page is served by Nginx out of a container.
 
@@ -97,7 +97,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 5.1 Green GitHub Actions run
 
-- [ ] **Save as:** `m5-actions-green.png`
+- [x] **Save as:** `m5-actions-green.png`  ✅ captured
 - [ ] **Also record the run URL** in `README.md`
 - **Capture:** <https://github.com/ChampDeepak/todo/actions> → the most recent green run on `main`
 - **Must be visible:** every job green, including the test job, the frontend build, and both image builds.
@@ -106,11 +106,27 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 5.2 GHCR packages with SHA tags
 
-- [ ] **Save as:** `m5-ghcr-packages.png`
+- [x] **Save as:** `m5-ghcr-packages.png`  ✅ captured
 - **Capture:** <https://github.com/ChampDeepak?tab=packages> → `todo-backend` and `todo-frontend`
 - **Must be visible:** both images published, tagged with the **Git commit SHA**. A screenshot showing only `latest` loses the 2 points for SHA-based tags.
 
 ![M5 GHCR packages](screenshots/m5-ghcr-packages.png)
+
+### 5.2b GHCR package pages showing the SHA tags
+
+- [x] **Save as:** `m5-ghcr-frontend-tags.png`  ✅ captured
+- [x] **Save as:** `m5-ghcr-backend-tags.png`  ✅ captured
+- **Capture:** <https://github.com/ChampDeepak/todo/pkgs/container/todo-frontend>
+  and <https://github.com/ChampDeepak/todo/pkgs/container/todo-backend>
+- **Why these exist:** the `?tab=packages` list in 5.2 proves both images were
+  published but shows **no tags at all**. The rubric awards 2 points for tags
+  that use the Git commit SHA rather than `latest`, so the tags have to be
+  visible somewhere. These package pages show them, e.g.
+  `sha-28d10a45262d4f0a961a5604fbb879e6fbbe19b7`, which is commit `28d10a4`.
+
+![M5 GHCR frontend tags](screenshots/m5-ghcr-frontend-tags.png)
+
+![M5 GHCR backend tags](screenshots/m5-ghcr-backend-tags.png)
 
 ---
 
@@ -119,7 +135,32 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 6.1 Trivy scan output
 
 - [ ] **Save as:** `m6-trivy-output.png`
-- **Capture:** the Trivy step's log inside a GitHub Actions run
+- **Capture:** the Trivy step's log inside a GitHub Actions run —
+  <https://github.com/ChampDeepak/todo/actions/runs/38936686470/job/117094046405#step:8:1>
+- **You must be signed in to GitHub for this one.** Actions logs are not visible
+  to logged-out visitors even on a public repo, so this is the one screenshot
+  that could not be automated.
+- **What the log says** (already verified against the run, so you can describe it
+  before you even open it) — the scan is **clean**:
+
+  ```text
+  INFO  Detected OS  family="alpine" version="3.23.4"
+  INFO  [alpine] Detecting vulnerabilities...  os_version="3.23" pkg_num=71
+
+  Report Summary
+  ┌──────────────────────────────────────────────────────┬────────┬─────────────────┬─────────┐
+  │                        Target                        │  Type  │ Vulnerabilities │ Secrets │
+  ├──────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
+  │ ghcr.io/champdeepak/todo-frontend:ci (alpine 3.23.4) │ alpine │        0        │    -    │
+  └──────────────────────────────────────────────────────┴────────┴─────────────────┴─────────┘
+  Legend:
+  - '0': Clean (no security findings detected)
+  ```
+
+  Severity gate was `HIGH,CRITICAL`, and secret scanning ran alongside the
+  vulnerability scan. Zero findings here is the *result of* the earlier fix —
+  commit `d1fb04c` moved the base image to `nginx:1.29-alpine`. That is the story
+  to tell: the gate caught a real problem, you fixed it, and the gate now passes.
 - **Must be visible:** which image was scanned and the findings table (a clean result is acceptable and scores full marks).
 - **Also needed:** a 2–3 sentence written explanation — this lives in `README.md`, not in the image.
 
@@ -129,31 +170,77 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ## M7 — Terraform (15 pts)
 
+> **Capture these in the order 7.2 → 7.3 → 7.4 → 7.1, not top to bottom.**
+> The console shots must happen while the infrastructure is alive, and the plan
+> shot is *easier* once it is gone. `terraform plan` only prints
+> `Plan: N to add` when the thing is not built yet — against fully-applied
+> infrastructure it prints `No changes`, which does not satisfy the "non-empty
+> plan" criterion. So: screenshot the console (7.2, 7.3), destroy (7.4), then
+> run `plan` against the now-empty state (7.1) and it shows the entire stack as
+> `to add`. That also means the EKS cluster stops billing as early as possible.
+
 ### 7.1 `terraform plan` output
 
 - [ ] **Save as:** `m7-terraform-plan.png`
-- **Capture:** `cd /Users/deepak/sst/todo/terraform && AWS_PROFILE=project terraform plan`
+- **Capture (do this LAST, after the destroy in 7.4):**
+  `cd /Users/deepak/sst/todo/terraform && AWS_PROFILE=project terraform plan`
 - **Must be visible:** the final summary line — `Plan: N to add, 0 to change, 0 to destroy` — with no errors above it.
+- **Why after the destroy:** against live infrastructure this command prints
+  `No changes`, which is not a non-empty plan. Against the empty post-destroy
+  state it plans the whole stack, which is exactly the line the rubric wants.
+  A plan makes no AWS resources and costs nothing, so this is safe to run.
 
 ![M7 terraform plan](screenshots/m7-terraform-plan.png)
 
 ### 7.2 AWS Console — VPC
 
-- [ ] **Save as:** `m7-aws-vpc.png`
+- [x] **Save as:** `m7-aws-vpc.png`  ✅ captured
 - **Capture:** <https://ap-south-1.console.aws.amazon.com/vpcconsole/home?region=ap-south-1#vpcs:> then the *Subnets* page
 - **Look for:** VPC named **`taskr-vpc`**, and subnets **`taskr-public-1`** and **`taskr-public-2`** (one per availability zone)
 - **Must be visible:** the region selector showing **Mumbai / ap-south-1**, and at least two public subnets. Account is `804210701870`, profile `project`.
 
 ![M7 AWS VPC](screenshots/m7-aws-vpc.png)
 
+### 7.2b AWS Console — Subnets
+
+- [x] **Save as:** `m7-aws-subnets.png`  ✅ captured
+- **Capture:** in the VPC console, left nav → **Subnets**, filter by VPC `taskr-vpc`
+- **Look for:** `taskr-public-1` (`10.0.0.0/24`, `ap-south-1a`) and `taskr-public-2`
+  (`10.0.1.0/24`, `ap-south-1b`), both **Available**
+- **Why this is separate from 7.2:** the *Your VPCs* page proves the VPC exists but
+  shows no subnets. The rubric gives 3 points for "VPC with **at least two public
+  subnets**", so the subnet rows have to be visible somewhere. This is that shot.
+
+![M7 AWS subnets](screenshots/m7-aws-subnets.png)
+
 ### 7.3 AWS Console — EKS cluster
 
-- [ ] **Save as:** `m7-aws-eks.png`
+- [x] **Save as:** `m7-aws-eks.png`  ✅ captured
 - **Capture:** <https://ap-south-1.console.aws.amazon.com/eks/home?region=ap-south-1#/clusters/taskr-cluster>
 - **Look for:** cluster **`taskr-cluster`**, Kubernetes 1.31, node group **`taskr-nodes`**
 - **Must be visible:** cluster status **`Active`** and the node group showing 2 nodes. Grab the *Compute* tab too if it fits.
+- **Node size is `t3.small`, not `t3.medium`:** this AWS account is Free Tier-restricted
+  and refuses to launch any instance type that is not free-tier eligible, so the
+  original `t3.medium` node group failed with
+  `InvalidParameterCombination - The specified instance type is not eligible for Free Tier`.
+  If a grader asks why the nodes are small, that is the answer — and it is a real
+  DevOps lesson: the cloud account's own policy is part of your infrastructure constraints.
 
 ![M7 AWS EKS](screenshots/m7-aws-eks.png)
+
+### 7.3b AWS Console — EKS Compute tab (node group)
+
+- [x] **Save as:** `m7-aws-eks-compute.png`  ✅ captured
+- **Capture:** the cluster page → **Compute** tab
+- **Look for:** node group `taskr-nodes`, status **Active**, desired size **2**,
+  instance type **t3.small**, AMI `AL2023_x86_64_STANDARD`
+- **Why this shot too:** the cluster overview's *Nodes* and *Pods* tiles read the
+  **Kubernetes API** and can show `Data unavailable` for a few minutes after the
+  nodes join, even with full cluster-admin access. The Compute tab reads the
+  **AWS API** instead, so the node group and its size always render. That is the
+  more reliable proof of "at least one worker node group".
+
+![M7 AWS EKS compute](screenshots/m7-aws-eks-compute.png)
 
 ### 7.4 `terraform destroy` completed
 
@@ -193,7 +280,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 8.4 Application through the Ingress
 
-- [ ] **Save as:** `m8-app-ingress.png`
+- [x] **Save as:** `m8-app-ingress.png`  ✅ captured
 - **Capture:** <http://localhost:8080> — the kind cluster maps your Mac's port 8080 to the Ingress controller inside the cluster.
 - **Must be visible:** the URL bar showing **`localhost:8080`, not `localhost:3000`**. Port 3000 is the docker-compose stack from M4; 8080 is Kubernetes. Showing the wrong one loses the point.
 - **First run this in your own terminal:** `kind export kubeconfig --name taskr`
@@ -207,14 +294,32 @@ Screenshots land on the Desktop by default. Move them in with:
 ### 9.1 `/metrics` endpoint
 
 - [ ] **Save as:** `m9-metrics-curl.png`
-- **Capture:** `kubectl exec -n taskr deploy/backend -- python -c "import urllib.request;print(urllib.request.urlopen('http://127.0.0.1:8000/metrics').read().decode()[:1500])"`
-- **Must be visible:** Prometheus text format — `# HELP` / `# TYPE` lines and real counter values.
+- **Capture:** the raw endpoint dumps Python GC metrics first, which proves little.
+  This filters to the *application's* HTTP metrics instead — far better evidence:
+
+  ```bash
+  kubectl exec -n taskr deploy/backend -- python -c "
+  import urllib.request
+  m=urllib.request.urlopen('http://127.0.0.1:8000/metrics').read().decode()
+  keep=[l for l in m.splitlines() if l.startswith(('# HELP http','# TYPE http')) or l.startswith('http_requests_total')]
+  print('\n'.join(keep[:22]))
+  "
+  ```
+
+- **Must be visible:** Prometheus text format — `# HELP` / `# TYPE` lines plus
+  `http_requests_total` rows with real per-endpoint counts, e.g.
+  `http_requests_total{handler="/api/tasks",method="GET",status="2xx"} 139.0`.
+- **If a grader asks about the `4xx` counts:** they are real, and you should own
+  them — traffic was generated against `/api/tasks?status=pending`, and `pending`
+  is not a valid status (the enum is `todo`, `in_progress`, `done`), so FastAPI
+  correctly returned 422. That is *why* the "Responses by status code" panel in
+  Grafana has two series instead of one.
 
 ![M9 metrics endpoint](screenshots/m9-metrics-curl.png)
 
 ### 9.2 Prometheus targets
 
-- [ ] **Save as:** `m9-prometheus-targets.png`
+- [x] **Save as:** `m9-prometheus-targets.png`  ✅ captured
 - **Capture:** <http://prometheus.localtest.me:8080> → *Status* → *Target health*. `localtest.me` resolves to 127.0.0.1, so no `/etc/hosts` edit is needed.
 - **Must be visible:** the application target with state **`UP`** and a recent scrape time.
 
@@ -222,7 +327,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 9.3 Grafana dashboard
 
-- [ ] **Save as:** `m9-grafana-dashboard.png`
+- [x] **Save as:** `m9-grafana-dashboard.png`  ✅ captured
 - **Capture:** <http://grafana.localtest.me:8080>, login `admin` / `admin`
 - **Must be visible:** at least one panel with **actual plotted data** — request rate, latency, or error rate. An empty panel scores zero for this criterion, so generate traffic against the app first.
 
