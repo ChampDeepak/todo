@@ -60,7 +60,7 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div>
-          <h1>Taskr</h1>
+          <h1>Taskr Demo</h1>
           <p className="subtitle">Task tracking for the DevOps capstone</p>
         </div>
       </header>

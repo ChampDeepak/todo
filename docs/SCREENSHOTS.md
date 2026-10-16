@@ -24,14 +24,14 @@ Screenshots land on the Desktop by default. Move them in with:
 | Module | Evidence needed | Captured |
 |---|---|---|
 | M1 — Application | 1 | ☑ 1 / 1 |
-| M2 — Testing | 1 | ☐ 0 / 1 |
+| M2 — Testing | 1 | ☑ 1 / 1 |
 | M3 — Git & GitHub | 1 | ☑ 1 / 1 |
-| M4 — Docker | 2 | ☐ 1 / 2 |
+| M4 — Docker | 2 | ☑ 2 / 2 |
 | M5 — CI/CD | 4 | ☑ 4 / 4 |
-| M6 — DevSecOps | 1 | ☐ 0 / 1 |
+| M6 — DevSecOps | 1 | ☑ 1 / 1 |
 | M7 — Terraform | 6 | ☑ 4 / 6 |
-| M8 — Kubernetes + Helm | 4 | ☐ 1 / 4 |
-| M9 — Observability | 3 | ☐ 2 / 3 |
+| M8 — Kubernetes + Helm | 4 | ☑ 4 / 4 |
+| M9 — Observability | 3 | ☑ 3 / 3 |
 | M10 — Presentation | 1 recording | ☐ 0 / 1 |
 | **Total** | **21 + 1 recording** | |
 
@@ -53,7 +53,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 2.1 Pytest passing
 
-- [ ] **Save as:** `m2-pytest-passing.png`
+- [x] **Save as:** `m2-pytest-passing.png`  ✅ captured
 - **Capture:** the terminal after `cd /Users/deepak/sst/todo/backend && .venv/bin/pytest -v`. Needs the compose Postgres running on port 5433, which it is.
 - **Must be visible:** the full command, every test name with `PASSED`, and the green summary line (`N passed in Xs`). Scroll so the summary and at least 5 test names are in one frame.
 
@@ -77,7 +77,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 4.1 `docker compose up --build` succeeding
 
-- [ ] **Save as:** `m4-compose-up.png`
+- [x] **Save as:** `m4-compose-up.png`  ✅ captured
 - **Capture:** `cd /Users/deepak/sst/todo && docker compose ps` (the stack is already built and healthy), or re-run `docker compose up --build` for the full build log
 - **Must be visible:** all three services (`db`, `backend`, `frontend`) reaching a started/healthy state in the same frame.
 
@@ -134,7 +134,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 6.1 Trivy scan output
 
-- [ ] **Save as:** `m6-trivy-output.png`
+- [x] **Save as:** `m6-trivy-output.png`  ✅ captured
 - **Capture:** the Trivy step's log inside a GitHub Actions run —
   <https://github.com/ChampDeepak/todo/actions/runs/38936686470/job/117094046405#step:8:1>
 - **You must be signed in to GitHub for this one.** Actions logs are not visible
@@ -256,7 +256,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 8.1 Pods running
 
-- [ ] **Save as:** `m8-kubectl-pods.png`
+- [x] **Save as:** `m8-kubectl-pods.png`  ✅ captured
 - **Capture:** `kubectl get pods -n <namespace>`
 - **Must be visible:** every pod `Running` with `READY 1/1`, and **at least 2 replicas each** for backend and frontend.
 
@@ -264,7 +264,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 8.2 Services
 
-- [ ] **Save as:** `m8-kubectl-svc.png`
+- [x] **Save as:** `m8-kubectl-svc.png`  ✅ captured
 - **Capture:** `kubectl get svc -n <namespace>`
 - **Must be visible:** ClusterIP services for both backend and frontend.
 
@@ -272,7 +272,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 8.3 Helm release
 
-- [ ] **Save as:** `m8-helm-list.png`
+- [x] **Save as:** `m8-helm-list.png`  ✅ captured
 - **Capture:** `helm list -n <namespace>`
 - **Must be visible:** the release with status `deployed`.
 
@@ -293,7 +293,7 @@ Screenshots land on the Desktop by default. Move them in with:
 
 ### 9.1 `/metrics` endpoint
 
-- [ ] **Save as:** `m9-metrics-curl.png`
+- [x] **Save as:** `m9-metrics-curl.png`  ✅ captured
 - **Capture:** the raw endpoint dumps Python GC metrics first, which proves little.
   This filters to the *application's* HTTP metrics instead — far better evidence:
 
