@@ -1,0 +1,292 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Taskr — DevOps Capstone</title>
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#FBFAF7; --ink:#15181D; --mute:#6B7280; --faint:#9AA1AC;
+    --rule:#E4E2DA; --accent:#0F5D54; --accent-soft:#E7F0EE; --warn:#9A3412; --warn-soft:#FBEDE6;
+  }
+  body{background:#555;font-family:-apple-system,"Helvetica Neue",Inter,Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .slide{width:1280px;height:720px;background:var(--bg);color:var(--ink);
+         padding:64px 72px;position:relative;overflow:hidden;page-break-after:always;
+         display:flex;flex-direction:column}
+  .slide:last-child{page-break-after:auto}
+  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--accent)}
+  h1{font-size:44px;font-weight:700;letter-spacing:-.02em;margin-top:10px;line-height:1.1}
+  .rule{height:2px;background:var(--accent);width:56px;margin:18px 0 28px}
+  .grid{display:grid;gap:26px;flex:1}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:repeat(3,1fr)}
+  .g2x2{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+  .col{border-top:1px solid var(--rule);padding-top:16px}
+  .col h3{font-size:19px;font-weight:700;color:var(--accent);margin-bottom:12px;letter-spacing:-.01em}
+  .col.warn h3{color:var(--warn)}
+  ul{list-style:none} li{font-size:14.5px;line-height:1.5;color:var(--ink);margin-bottom:10px;
+      padding-left:14px;position:relative}
+  li:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;
+            background:var(--accent)}
+  .col.warn li:before{background:var(--warn)}
+  li b{font-weight:650} li span{color:var(--mute);display:block;font-size:13.5px;margin-top:2px}
+  .flow{display:flex;align-items:stretch;gap:0;margin-bottom:30px}
+  .step{flex:1;background:#fff;border:1px solid var(--rule);border-top:3px solid var(--accent);
+        padding:14px 16px}
+  .step b{display:block;font-size:14.5px;font-weight:700} .step span{font-size:12.5px;color:var(--mute);line-height:1.45;display:block;margin-top:4px}
+  .arr{display:flex;align-items:center;padding:0 10px;color:var(--faint);font-size:19px}
+  .foot{position:absolute;left:72px;right:72px;bottom:26px;display:flex;justify-content:space-between;
+        font-size:11.5px;color:var(--faint);border-top:1px solid var(--rule);padding-top:10px}
+  /* title slide */
+  .title-slide{justify-content:center;background:var(--bg)}
+  .title-slide .kicker{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+        color:var(--accent);margin-bottom:22px}
+  .title-slide h1{font-size:88px;line-height:.98;letter-spacing:-.035em}
+  .lede{font-size:23px;color:var(--mute);margin-top:18px;max-width:830px;line-height:1.4}
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:60px;border-top:1px solid var(--rule)}
+  .meta div{padding:18px 26px 0 0}
+  .meta dt{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .meta dd{font-size:15px;margin-top:7px;line-height:1.45}
+  .stat{display:flex;gap:34px;margin-bottom:26px}
+  .stat div b{display:block;font-size:34px;font-weight:700;letter-spacing:-.02em;color:var(--accent)}
+  .stat div span{font-size:12.5px;color:var(--mute)}
+  .note{background:var(--accent-soft);border-left:3px solid var(--accent);padding:13px 17px;
+        font-size:14px;line-height:1.5;margin-bottom:24px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+       background:#F0EFE9;padding:1px 5px;border-radius:3px}
+</style></head><body>
+
+<!-- 1 TITLE -->
+<section class="slide title-slide">
+  <div class="kicker">DevOps Capstone Project</div>
+  <h1>Taskr</h1>
+  <p class="lede">One code change, followed end to end — tested, scanned, versioned,
+     deployed to Kubernetes, observed, and torn back down to nothing.</p>
+  <div class="meta">
+    <div><dt>Repository</dt><dd>github.com/ChampDeepak/todo</dd></div>
+    <div><dt>Application</dt><dd>React 18 · FastAPI · PostgreSQL 16</dd></div>
+    <div><dt>Platform</dt><dd>Docker · GitHub Actions · Trivy · Terraform · EKS · Helm · Prometheus · Grafana</dd></div>
+  </div>
+</section>
+
+<!-- 2 APP + TESTS -->
+<section class="slide">
+  <div class="eyebrow">Modules 1 &amp; 2 · Application and testing</div>
+  <h1>A small app, built to be operated</h1><div class="rule"></div>
+  <div class="grid g2">
+    <div class="col"><h3>Three tiers, eight endpoints</h3><ul>
+      <li><b>Frontend</b><span>React 18 + Vite SPA, served by Nginx from a multi-stage build.</span></li>
+      <li><b>Backend</b><span>FastAPI with SQLAlchemy; <code>GET/POST/PUT/DELETE /api/tasks</code>, plus <code>/stats</code> and <code>/{id}</code>.</span></li>
+      <li><b>Database</b><span>PostgreSQL 16, schema managed by Alembic migrations.</span></li>
+      <li><b>Health &amp; readiness</b><span><code>/health</code> is liveness; <code>/health/ready</code> checks the database.</span></li>
+      <li><b>Metrics</b><span><code>/metrics</code> exposed via prometheus-fastapi-instrumentator.</span></li>
+    </ul></div>
+    <div class="col"><h3>Tests as the first gate</h3>
+      <div class="stat"><div><b>32</b><span>tests passing</span></div>
+                        <div><b>5</b><span>test modules</span></div>
+                        <div><b>0.4s</b><span>full run</span></div></div>
+      <ul>
+      <li><b>Isolated per test</b><span>Each test gets its own database, so order never changes the result.</span></li>
+      <li><b>Coverage across the API</b><span>CRUD, filters, listing, validation and health — not just the happy path.</span></li>
+      <li><b>Lint in the same gate</b><span>Ruff runs beside pytest; style failures stop the build too.</span></li>
+      <li><b>Nothing is built if a test fails</b><span>The image job depends on the test job, so a red test never produces an artifact.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>02</span></div>
+</section>
+
+<!-- 3 DOCKER -->
+<section class="slide">
+  <div class="eyebrow">Modules 3 &amp; 4 · Version control and containers</div>
+  <h1>Reproducible from a clone</h1><div class="rule"></div>
+  <div class="grid g3">
+    <div class="col"><h3>Git discipline</h3><ul>
+      <li><b>29 commits, each a real change</b><span>Messages describe intent, not "update" or "fix".</span></li>
+      <li><b>Secrets never committed</b><span><code>.gitignore</code> excludes <code>.env</code>, state files and kubeconfigs.</span></li>
+      <li><b>Credentials-free example</b><span><code>terraform.tfvars.example</code> ships settings without keys.</span></li>
+    </ul></div>
+    <div class="col"><h3>Images built small and unprivileged</h3><ul>
+      <li><b>Multi-stage frontend</b><span><code>node:22-alpine</code> builds; <code>nginx:1.29-alpine</code> serves. Build tools never ship.</span></li>
+      <li><b>Slim backend</b><span><code>python:3.12-slim</code> with pinned, lock-resolved dependencies.</span></li>
+      <li><b>Non-root at runtime</b><span>Both images drop to an unprivileged user before the process starts.</span></li>
+    </ul></div>
+    <div class="col"><h3>One command locally</h3><ul>
+      <li><b><code>docker compose up --build</code></b><span>Frontend, backend and Postgres, wired together.</span></li>
+      <li><b>Health-gated startup</b><span>The API waits for the database to report healthy rather than racing it.</span></li>
+      <li><b>Migrations on boot</b><span>The entrypoint applies Alembic migrations before serving.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>03</span></div>
+</section>
+
+<!-- 4 CI/CD -->
+<section class="slide">
+  <div class="eyebrow">Module 5 · Continuous delivery</div>
+  <h1>The pipeline is the only path to production</h1><div class="rule"></div>
+  <div class="flow">
+    <div class="step"><b>git push</b><span>main branch</span></div><div class="arr">→</div>
+    <div class="step"><b>Lint &amp; test</b><span>Ruff + 32 pytest</span></div><div class="arr">→</div>
+    <div class="step"><b>Build</b><span>frontend + both images</span></div><div class="arr">→</div>
+    <div class="step"><b>Trivy scan</b><span>HIGH/CRITICAL gate</span></div><div class="arr">→</div>
+    <div class="step"><b>Push to GHCR</b><span>tagged by commit SHA</span></div>
+  </div>
+  <div class="grid g2">
+    <div class="col"><h3>Four jobs, explicit dependencies</h3><ul>
+      <li><b>Lint and test</b><span>Runs against a real PostgreSQL service container.</span></li>
+      <li><b>Build frontend</b><span>Runs in parallel; independent of the tests.</span></li>
+      <li><b>Build, scan and push ×2</b><span>A matrix over backend and frontend. Reached only if the gates pass.</span></li>
+      <li><b>Scan before push, not after</b><span>The image is built locally, scanned, and published only on a clean result.</span></li>
+    </ul></div>
+    <div class="col"><h3>Tagged by commit, never <code>latest</code></h3><ul>
+      <li><b>One identifier end to end</b><span>Commit, CI run, image and running pod all carry the same SHA.</span></li>
+      <li><b>Example</b><span><code>ghcr.io/champdeepak/todo-frontend:sha-28d10a4…</code></span></li>
+      <li><b>Rollback becomes trivial</b><span>A previous version always exists to return to — with <code>latest</code> it does not.</span></li>
+      <li><b>Provenance</b><span>Any running container can be traced back to the exact source that produced it.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>04</span></div>
+</section>
+
+<!-- 5 SECURITY -->
+<section class="slide">
+  <div class="eyebrow">Module 6 · DevSecOps</div>
+  <h1>The scan caught something real</h1><div class="rule"></div>
+  <div class="note">Trivy runs on every build with <code>severity: HIGH,CRITICAL</code> and <code>exit-code: 1</code>.
+    <code>ignore-unfixed</code> is on, so the gate blocks only on findings someone can actually act on —
+    a scanner that cries wolf gets switched off.</div>
+  <div class="grid g2">
+    <div class="col warn"><h3>What it found</h3><ul>
+      <li><b>43 findings in the frontend image</b><span>41 HIGH and 2 CRITICAL, nearly all in OpenSSL.</span></li>
+      <li><b>CVE-2026-31789 — CRITICAL</b><span>Heap buffer overflow in OpenSSL, fixed upstream in 3.3.7.</span></li>
+      <li><b>Root cause: an aged base image</b><span><code>nginx:1.27-alpine</code> shipped Alpine 3.21 with OpenSSL 3.3.3.</span></li>
+      <li><b>The push was blocked</b><span>The vulnerable image never reached the registry.</span></li>
+    </ul></div>
+    <div class="col"><h3>What changed</h3><ul>
+      <li><b>Base image moved forward</b><span><code>nginx:1.29-alpine</code> — Alpine 3.23, OpenSSL 3.5.6.</span></li>
+      <li><b>Scan now clean</b><span>0 vulnerabilities across 71 OS packages; secret scanning passes too.</span></li>
+      <li><b>Visible in history</b><span>Commit <code>d1fb04c</code> exists for no other reason than this fix.</span></li>
+      <li><b>The lesson</b><span>The flaw was not in code we wrote. It was in a dependency that aged — which is why the scan runs on every build, not once at review.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>05</span></div>
+</section>
+
+<!-- 6 TERRAFORM -->
+<section class="slide">
+  <div class="eyebrow">Module 7 · Infrastructure as code</div>
+  <h1>Fifteen resources, created and destroyed from code</h1><div class="rule"></div>
+  <div class="grid g2">
+    <div class="col"><h3>What Terraform provisions</h3>
+      <div class="stat"><div><b>15</b><span>resources</span></div>
+                        <div><b>2</b><span>availability zones</span></div>
+                        <div><b>1.31</b><span>Kubernetes version</span></div></div>
+      <ul>
+      <li><b>Network</b><span>VPC <code>10.0.0.0/16</code> in ap-south-1, two public subnets across <code>1a</code> and <code>1b</code>, internet gateway and routing.</span></li>
+      <li><b>Cluster</b><span>EKS control plane with API-mode access and audit logging enabled.</span></li>
+      <li><b>Compute</b><span>Managed node group, two <code>t3.small</code> nodes, one per zone.</span></li>
+      <li><b>Identity</b><span>Separate roles for the control plane and the nodes, least privilege by attachment.</span></li>
+    </ul></div>
+    <div class="col"><h3>Operating it safely</h3><ul>
+      <li><b>Destroy order is derived, not written</b><span>Node group before cluster, cluster before subnets, subnets before VPC — all from the dependency graph.</span></li>
+      <li><b>Proof of reproducibility</b><span><code>Destroy complete! 15 resources destroyed</code>, then <code>Plan: 15 to add</code> against the empty state.</span></li>
+      <li><b>No credentials in the repo</b><span>Auth comes from the AWS CLI profile; state and tfvars are gitignored.</span></li>
+      <li><b>Cost discipline</b><span>EKS bills $0.10/hour whether or not a pod runs, so teardown is part of the workflow.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>06</span></div>
+</section>
+
+<!-- 7 K8S / HELM -->
+<section class="slide">
+  <div class="eyebrow">Module 8 · Kubernetes and Helm</div>
+  <h1>Deployed by chart, not by hand</h1><div class="rule"></div>
+  <div class="grid g3">
+    <div class="col"><h3>The chart</h3><ul>
+      <li><b><code>taskr</code> 0.1.0</b><span>Templates for backend, frontend, Postgres, ingress and shared helpers.</span></li>
+      <li><b>Image tag is a parameter</b><span><code>--set frontend.image.tag=$SHA</code> is the only thing that changes between releases.</span></li>
+      <li><b>Revision history</b><span>Helm keeps every release, so <code>helm rollback</code> is one command.</span></li>
+    </ul></div>
+    <div class="col"><h3>Workloads</h3><ul>
+      <li><b>Two replicas each</b><span>Backend and frontend both run two pods.</span></li>
+      <li><b>Rolling updates</b><span>One pod at a time; the readiness probe must pass before the old pod goes.</span></li>
+      <li><b>ClusterIP services</b><span>Backend on 8000, frontend on 8080, Postgres on 5432 — none exposed directly.</span></li>
+    </ul></div>
+    <div class="col"><h3>Routing</h3><ul>
+      <li><b>Single entry point</b><span>One Ingress fronts the whole application.</span></li>
+      <li><b><code>/</code> → frontend</b><span>Static assets served by Nginx.</span></li>
+      <li><b><code>/api</code> and <code>/health</code> → backend</b><span>Same origin, so no CORS in the browser path.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>07</span></div>
+</section>
+
+<!-- 8 OBSERVABILITY -->
+<section class="slide">
+  <div class="eyebrow">Module 9 · Observability</div>
+  <h1>Metrics from the pods, not the service</h1><div class="rule"></div>
+  <div class="flow">
+    <div class="step"><b>FastAPI</b><span>exposes /metrics</span></div><div class="arr">→</div>
+    <div class="step"><b>ServiceMonitor</b><span>selects backend pods</span></div><div class="arr">→</div>
+    <div class="step"><b>Prometheus</b><span>scrapes each pod</span></div><div class="arr">→</div>
+    <div class="step"><b>Grafana</b><span>six live panels</span></div>
+  </div>
+  <div class="grid g2">
+    <div class="col"><h3>What is scraped</h3><ul>
+      <li><b>Both replicas, individually</b><span>The target list shows 2 / 2 up, each pod by name — not one aggregated service endpoint.</span></li>
+      <li><b>Why that matters</b><span>If one replica degrades, you can see which one. Scraping the Service would hide it behind a load balancer.</span></li>
+      <li><b>Kubernetes-native discovery</b><span>A ServiceMonitor CRD selects by label, so new pods are picked up automatically.</span></li>
+    </ul></div>
+    <div class="col"><h3>What the dashboard shows</h3><ul>
+      <li><b>Rate</b><span>Requests per second, broken down by endpoint.</span></li>
+      <li><b>Errors</b><span>Responses by status class — 2xx against 4xx.</span></li>
+      <li><b>Duration</b><span>p50, p95 and p99 latency from histogram buckets.</span></li>
+      <li><b>Saturation and health</b><span>Resident memory per pod, and a live count of pods being scraped.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>08</span></div>
+</section>
+
+<!-- 9 INCIDENTS -->
+<section class="slide">
+  <div class="eyebrow">What actually went wrong</div>
+  <h1>Three failures worth keeping</h1><div class="rule"></div>
+  <div class="grid g3">
+    <div class="col warn"><h3>A silent cloud quota</h3><ul>
+      <li><b>Symptom</b><span>The node group sat for 25 minutes with zero instances and no error on the resource itself.</span></li>
+      <li><b>Cause</b><span>A Free Tier account refuses any instance type not on its list. <code>t3.medium</code> is not.</span></li>
+      <li><b>Lesson</b><span>The real reason was only in the Auto Scaling group's activity history. Read the layer that actually launches things.</span></li>
+    </ul></div>
+    <div class="col warn"><h3>An interrupted destroy</h3><ul>
+      <li><b>Symptom</b><span>A rebuilt node group failed: instances ran, but never joined the cluster.</span></li>
+      <li><b>Cause</b><span>A cancelled <code>terraform destroy</code> had already deleted the route table in parallel, leaving subnets with no route out.</span></li>
+      <li><b>Lesson</b><span>Interrupting a destroy is not an undo. What survives depends on the graph, not on intent.</span></li>
+    </ul></div>
+    <div class="col warn"><h3>A stale base image</h3><ul>
+      <li><b>Symptom</b><span>CI went red on an image whose application code had not changed.</span></li>
+      <li><b>Cause</b><span>A critical OpenSSL CVE disclosed against the pinned Alpine base.</span></li>
+      <li><b>Lesson</b><span>Dependencies rot without being touched. Scanning every build is what makes that visible.</span></li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>Taskr — DevOps Capstone</span><span>09</span></div>
+</section>
+
+<!-- 10 CLOSING -->
+<section class="slide">
+  <div class="eyebrow">Module 10 · Review</div>
+  <h1>What this demonstrates</h1><div class="rule"></div>
+  <div class="grid g2x2">
+    <div class="col"><h3>Every gate is automatic</h3><ul>
+      <li>Tests, lint and a vulnerability scan all run before an artifact exists. Nothing reaches the registry on a human's say-so.</li>
+    </ul></div>
+    <div class="col"><h3>Every artifact is traceable</h3><ul>
+      <li>The commit, the CI run, the image tag and the running pod share one identifier, which is what makes a rollback a single command.</li>
+    </ul></div>
+    <div class="col"><h3>The environment is disposable</h3><ul>
+      <li>Fifteen resources destroyed, then fifteen planned to add from the same configuration. Nothing was clicked, and nothing was left billing.</li>
+    </ul></div>
+    <div class="col"><h3>Known shortcuts, stated plainly</h3><ul>
+      <li>Postgres runs in-cluster rather than RDS, migrations run in the entrypoint rather than a Job, subnets are public to avoid NAT cost, and state is local. Each is a deliberate trade, documented in the README.</li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>github.com/ChampDeepak/todo</span><span>10</span></div>
+</section>
+
+</body></html>

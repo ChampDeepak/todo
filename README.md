@@ -26,6 +26,7 @@ full-quality file is [`docs/screenshots/m10-demo.mp4`](docs/screenshots/m10-demo
 **Repository:** <https://github.com/ChampDeepak/todo>
 **CI pipeline:** <https://github.com/ChampDeepak/todo/actions>
 **Latest green run:** <https://github.com/ChampDeepak/todo/actions/runs/38970270985>
+**Presentation:** [docs/slides/slides.pdf](docs/slides/slides.pdf) — 10 slides
 **Submission evidence:** [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 
 ---
