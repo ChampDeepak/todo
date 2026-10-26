@@ -303,7 +303,7 @@
 
 ### 10.1 Live demo recording
 
-- [x] **Save as:** `m10-demo.mp4`  ✅ captured — 7:45, narrated, committed
+- [x] **Save as:** `demo/m10-demo.mp4`  ✅ captured — 7:45, narrated, committed
 - **What it covers:** the deploy loop (code change → push → CI → Helm rollout →
   rollback), the observability stack, and the cloud teardown ending on
   `Destroy complete! 15 resources destroyed` and `Plan: 15 to add`.

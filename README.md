@@ -18,15 +18,19 @@ destroyed, then fifteen to add against the empty state, which is the proof it
 rebuilds from this repository alone.
 
 The player above is a downscaled copy that fits GitHub's upload limit. The
-full-quality file is [`docs/screenshots/m10-demo.mp4`](docs/screenshots/m10-demo.mp4)
+full-quality file is [`demo/m10-demo.mp4`](demo/m10-demo.mp4)
 (7:45, 1920×1248), and the transcript is in [`captions.srt`](captions.srt).
+
+Everything shown in the demo section lives in [`demo/`](demo/): the recording,
+the slide deck as [`demo/slides.pdf`](demo/slides.pdf), and the HTML source the
+PDF is printed from, [`demo/slides.html`](demo/slides.html).
 
 ---
 
 **Repository:** <https://github.com/ChampDeepak/todo>
 **CI pipeline:** <https://github.com/ChampDeepak/todo/actions>
 **Latest green run:** <https://github.com/ChampDeepak/todo/actions/runs/38970270985>
-**Presentation:** [docs/slides/slides.pdf](docs/slides/slides.pdf) — 10 slides
+**Presentation:** [demo/slides.pdf](demo/slides.pdf) — 10 slides
 **Submission evidence:** [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 
 ---
@@ -246,6 +250,7 @@ case, and it is why the scan runs on every build rather than once at review.
 | `k8s/` | Namespace and the kind cluster definition |
 | `helm/` | Helm chart: deployments, services, ingress, secret |
 | `monitoring/` | Prometheus/Grafana values and the ServiceMonitor |
+| `demo/` | Demo recording and the presentation deck (PDF + HTML source) |
 | `docs/` | Screenshot tracker and submission evidence |
 
 ---
